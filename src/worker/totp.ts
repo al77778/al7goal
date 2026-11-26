@@ -39,8 +39,11 @@ export function base32Decode(input: string): Uint8Array {
 }
 
 async function hmacSha1(key: Uint8Array, msg: Uint8Array): Promise<Uint8Array> {
-  const k = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign'])
-  const sig = await crypto.subtle.sign('HMAC', k, msg)
+  // Copy into ArrayBuffer-backed views so WebCrypto's BufferSource accepts them.
+  const keyBytes = Uint8Array.from(key)
+  const msgBytes = Uint8Array.from(msg)
+  const k = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign'])
+  const sig = await crypto.subtle.sign('HMAC', k, msgBytes)
   return new Uint8Array(sig)
 }
 

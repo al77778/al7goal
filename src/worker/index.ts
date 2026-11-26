@@ -1,5 +1,6 @@
 import { createApp } from './app'
 import { getAuth, type Env } from './auth'
+import type { ExecutionContext } from 'hono'
 
 const app = createApp()
 export default {

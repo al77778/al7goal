@@ -1,3 +1,5 @@
+/// <reference path="../worker/globals.d.ts" />
+
 export type TxType =
   | 'deposit'
   | 'withdraw'

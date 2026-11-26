@@ -9,7 +9,7 @@
     "build": "vite build && node scripts/postbuild.mjs",
     "build:vercel": "vite build --config vite.config.vercel.ts",
     "vercel-build": "npm run build:vercel",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json && tsc --noEmit -p tsconfig.node.json",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.typecheck-all.json",
     "test": "tsx --test tests/api.test.ts"
   },
   "engines": {
