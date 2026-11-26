@@ -1,6 +1,6 @@
 // A D1-compatible facade over PostgreSQL, so the existing Worker routes and SQL
 // run unchanged on Node/Vercel. Placeholders are rewritten `?` -> `$1..$n`.
-import type { Client, FieldMeta } from './pg'
+import type { Client, FieldMeta } from './pg.js'
 
 const NUMERIC_TYPES = new Set([20, 21, 23, 1700]) // int8, int2, int4, numeric
 const NUMERIC_COLUMNS = /^(count|sum|c|s|amount|balance_before|balance_after|total|total_in|total_out|users|transactions)$/i

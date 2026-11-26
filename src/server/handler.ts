@@ -1,7 +1,7 @@
 // Node entry that mounts the existing Hono app with a PostgreSQL-backed D1 facade.
-import { createApp } from '../worker/app'
-import { resolveClient, type Storage } from './db'
-import { createD1 } from './pgD1'
+import { createApp } from '../worker/app.js'
+import { resolveClient, type Storage } from './db.js'
+import { createD1 } from './pgD1.js'
 
 const inner = createApp()
 

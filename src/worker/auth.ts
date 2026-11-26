@@ -1,6 +1,6 @@
 import { createFreebuffAuth } from '@freebuff/auth'
 import type { FreebuffAuth, FreebuffUser } from '@freebuff/auth'
-import { accountFromRequest } from './userAuth'
+import { accountFromRequest } from './userAuth.js'
 
 export type Env = {
   ASSETS: Fetcher

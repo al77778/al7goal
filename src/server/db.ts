@@ -1,6 +1,6 @@
 // Per-process database for the Node/Vercel target.
-import { createD1, type D1Like } from './pgD1'
-import { createPgClient, createPgliteClient, databaseUrl, hasDatabaseUrl, type Client } from './pg'
+import { createD1, type D1Like } from './pgD1.js'
+import { createPgClient, createPgliteClient, databaseUrl, hasDatabaseUrl, type Client } from './pg.js'
 
 export type Storage = 'postgres' | 'ephemeral'
 

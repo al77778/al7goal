@@ -3,20 +3,20 @@ import type { FreebuffUser } from '@freebuff/auth'
 import { Hono, type Handler } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
-import { appOrigin, currentUser, isLocalPreview, type Env } from './auth'
+import { appOrigin, currentUser, isLocalPreview, type Env } from './auth.js'
 import {
   ensureSchema, mapTx, mapSavedAccount, mapNotification, mapProfile, mapAudit,
   getBalance, computeSummary, type TxRow, type SavedAccountRow, type NotificationRow, type ProfileRow, type AuditRow,
-} from './db'
-import { generateTotpSecret, totpCode, verifyTotp } from './totp'
+} from './db.js'
+import { generateTotpSecret, totpCode, verifyTotp } from './totp.js'
 import {
   USER_COOKIE, accountFromRequest, checkThrottle, clearFailures, constantTimeEqual,
   hashPassword as hashAccountPassword, makeSalt, noteFailure, randomCode, randomToken,
   type AccountRow,
-} from './userAuth'
+} from './userAuth.js'
 import type {
   Transaction, SavedAccount, AppNotification, Profile, AuditLog, BalanceSummary,
-} from '../shared/types'
+} from '../shared/types.js'
 
 type AppContext = {
   Bindings: Env & { DB: D1Database }
@@ -617,6 +617,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
       `INSERT INTO transactions (id, owner_sub, type, amount, note, status, balance_before, balance_after, counterparty, reference, created_at)
        VALUES (?, ?, 'transfer_out', ?, ?, 'success', ?, ?, ?, ?, ?)`,
     ).bind(txId, user.sub, total, note || `Transfer ke ${cp}`, balanceBefore, balanceAfter, cp, reference, now()).run()
+    // In demo mode, also credit a virtual recipient? No—just record outgoing. Add fee note in note if fee.
     if (fee > 0) {
       await addNotification(db, user.sub, 'Transfer berhasil', `Rp${amount.toLocaleString('id-ID')} + biaya Rp${fee.toLocaleString('id-ID')} telah ditransfer.`, 'success')
     } else {
@@ -636,6 +637,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
     const txId = uid()
     const reference = 'QRIS-' + txId.slice(0, 8).toUpperCase()
     const amt = amount || 0
+    // Create pending transaction
     const balanceBefore = await getBalance(db, user.sub)
     await db.prepare(
       `INSERT INTO transactions (id, owner_sub, type, amount, note, status, balance_before, balance_after, counterparty, reference, created_at)
@@ -671,9 +673,11 @@ export function createApp(authenticate: Authenticate = currentUser) {
     if (row.status === 'success') return c.json({ ok: true, already: true })
     const amount = row.amount || 0
     if (amount <= 0) {
+      // ask amount
       const body: any = await c.req.json().catch(() => null)
       const a = Number(body?.amount)
       if (!Number.isFinite(a) || a <= 0) return c.json({ error: 'Nominal pembayaran diperlukan.' }, 400)
+      // update amount
       await db.prepare('UPDATE transactions SET amount = ? WHERE id = ?').bind(a, row.id).run()
     }
     const fresh = await db.prepare('SELECT * FROM transactions WHERE id = ?').bind(row.id).first<TxRow>()
@@ -752,6 +756,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
       const from = parseInt(c.req.query('from') || '0', 10)
       const to = parseInt(c.req.query('to') || String(n), 10)
       since = from
+      // handled below
       const result = await db.prepare(
         'SELECT * FROM transactions WHERE owner_sub = ? AND created_at >= ? AND created_at <= ? ORDER BY created_at DESC',
       ).bind(user.sub, from, to).all<TxRow>()
@@ -776,7 +781,6 @@ export function createApp(authenticate: Authenticate = currentUser) {
   app.use('/api/admin/notify*', adminGuard)
   app.use('/api/admin/settings*', adminGuard)
   app.use('/api/admin/totp*', adminGuard)
-  app.use('/api/admin/failed*', adminGuard)
 
   app.get('/api/admin/stats', async (c) => {
     const database = c.env.DB
@@ -796,6 +800,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
     const db = c.env.DB
     const result = await db.prepare('SELECT * FROM profiles ORDER BY joined_at DESC LIMIT 500').all<ProfileRow>()
     const profiles = result.results.map(mapProfile)
+    // attach balance per user
     const out = []
     for (const p of profiles) {
       const bal = await getBalance(db, p.sub)
@@ -842,6 +847,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
       return c.json({ ok: true, balanceBefore, balanceAfter })
     }
     if (action === 'suspend' || action === 'activate') {
+      // store in profile? We'll just audit; no suspend column. Add note.
       await db.prepare(
         `INSERT INTO audit_logs (id, admin_id, admin_username, action, target_sub, reason, note, amount, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)`,
       ).bind(uid(), admin.id, admin.username, action, sub, reason, note, now()).run()
@@ -879,6 +885,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
     const row = await db.prepare('SELECT * FROM transactions WHERE id = ?').bind(c.req.param('id')).first<TxRow>()
     if (!row) return c.json({ error: 'Not found.' }, 404)
     if (row.status === status) return c.json({ ok: true })
+    // If approving a pending transaction, adjust balance
     if (row.status === 'pending' && status === 'success') {
       const balanceBefore = await getBalance(db, row.owner_sub)
       const balanceAfter = balanceBefore + row.amount
@@ -903,7 +910,7 @@ export function createApp(authenticate: Authenticate = currentUser) {
     const body: any = await c.req.json().catch(() => null)
     const title = String(body?.title || '').trim().slice(0, 80)
     const message = String(body?.message || '').trim().slice(0, 500)
-    const target = String(body?.target || 'all')
+    const target = String(body?.target || 'all') // 'all' or sub
     if (!title || !message) return c.json({ error: 'Judul dan pesan diperlukan.' }, 400)
     if (target === 'all') {
       const users = await db.prepare('SELECT sub FROM profiles').all<{ sub: string }>()

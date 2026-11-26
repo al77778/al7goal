@@ -1,5 +1,5 @@
-import type { Transaction, SavedAccount, AppNotification, Profile, AuditLog } from '../shared/types'
-import { accountSchema } from './userAuth'
+import type { Transaction, SavedAccount, AppNotification, Profile, AuditLog } from '../shared/types.js'
+import { accountSchema } from './userAuth.js'
 
 const schema = [
   `CREATE TABLE IF NOT EXISTS profiles (
