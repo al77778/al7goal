@@ -5,13 +5,26 @@
   "outputDirectory": "dist/vercel",
   "functions": {
     "api/index.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": [
+        "node_modules/@hono/node-server/**",
+        "node_modules/@electric-sql/pglite/dist/pglite.wasm",
+        "node_modules/@electric-sql/pglite/dist/pglite.data",
+        "node_modules/@electric-sql/pglite/dist/initdb.wasm"
+      ]
     },
     "api/[...path].ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": [
+        "node_modules/@hono/node-server/**",
+        "node_modules/@electric-sql/pglite/dist/pglite.wasm",
+        "node_modules/@electric-sql/pglite/dist/pglite.data",
+        "node_modules/@electric-sql/pglite/dist/initdb.wasm"
+      ]
     }
   },
   "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/[...path]" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

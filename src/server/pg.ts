@@ -1,6 +1,11 @@
 // PostgreSQL clients for the Vercel/Node target.
 // A real connection string (DATABASE_URL) gives durable storage; without one the
 // demo falls back to PGlite, a real Postgres compiled to WASM living in /tmp.
+import { existsSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 export type FieldMeta = { name: string; dataTypeID?: number }
 export type QueryResult = { rows: Record<string, any>[]; fields?: FieldMeta[]; affectedRows?: number }
 
@@ -45,9 +50,58 @@ export async function createPgClient(url: string): Promise<Client> {
   }
 }
 
+/**
+ * Where the PGlite package stores its WASM payload. A serverless bundler can
+ * inline the library, so `import.meta.url` no longer points at the package
+ * directory and PGlite's own `new URL('pglite.wasm', import.meta.url)` fails.
+ * We look the files up ourselves and hand them to PGlite instead.
+ */
+function pgliteAssetDirs(): string[] {
+  const dirs = new Set<string>()
+  const add = (dir: string) => dirs.add(dir)
+  for (const base of [process.cwd(), '/var/task']) {
+    add(join(base, 'node_modules/@electric-sql/pglite/dist'))
+  }
+  try {
+    const here = dirname(fileURLToPath(import.meta.url))
+    add(join(here, 'node_modules/@electric-sql/pglite/dist'))
+    add(here)
+  } catch {
+    // Bundled as CommonJS without import.meta.url: the paths above still apply.
+  }
+  return [...dirs]
+}
+
+type PgliteAssets = {
+  pgliteWasmModule: WebAssembly.Module
+  initdbWasmModule?: WebAssembly.Module
+  fsBundle: Blob
+}
+
+async function loadPgliteAssets(): Promise<PgliteAssets | undefined> {
+  for (const dir of pgliteAssetDirs()) {
+    const wasmPath = join(dir, 'pglite.wasm')
+    const dataPath = join(dir, 'pglite.data')
+    if (!existsSync(wasmPath) || !existsSync(dataPath)) continue
+    const initdbPath = join(dir, 'initdb.wasm')
+    const [wasm, data, initdb] = await Promise.all([
+      readFile(wasmPath),
+      readFile(dataPath),
+      existsSync(initdbPath) ? readFile(initdbPath) : Promise.resolve(undefined),
+    ])
+    return {
+      pgliteWasmModule: new WebAssembly.Module(wasm),
+      initdbWasmModule: initdb ? new WebAssembly.Module(initdb) : undefined,
+      fsBundle: new Blob([data]),
+    }
+  }
+  return undefined
+}
+
 export async function createPgliteClient(dataDir: string): Promise<Client> {
   const { PGlite } = await import('@electric-sql/pglite')
-  const db = await PGlite.create(dataDir)
+  const assets = await loadPgliteAssets()
+  const db = await PGlite.create(dataDir, assets)
   return {
     async query(text, params = []) {
       const res: any = await db.query(text, params)

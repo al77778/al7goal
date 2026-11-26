@@ -57,10 +57,12 @@ export function toPostgres(sql: string): string {
 }
 
 type Row = Record<string, any>
+/** A client, or a promise for one, so the connection can be opened lazily. */
+type ClientSource = Client | Promise<Client>
 
 class Statement {
   constructor(
-    private readonly client: Client,
+    private readonly client: ClientSource,
     private readonly sql: string,
     private readonly params: unknown[] = [],
   ) {}
@@ -70,7 +72,8 @@ class Statement {
   }
 
   private async execute(): Promise<{ rows: Row[]; affectedRows?: number }> {
-    const res = await this.client.query(toPostgres(this.sql), this.params)
+    const client = await this.client
+    const res = await client.query(toPostgres(this.sql), this.params)
     return { rows: (res.rows || []).map((row) => convertRow(row, res.fields)), affectedRows: res.affectedRows }
   }
 
@@ -104,12 +107,13 @@ export type D1Like = {
   exec(sql: string): Promise<void>
 }
 
-export function createD1(client: Client): D1Like {
+export function createD1(source: ClientSource): D1Like {
   return {
     prepare(sql: string) {
-      return new Statement(client, sql)
+      return new Statement(source, sql)
     },
     async batch(statements: Statement[]) {
+      const client = await source
       const out: unknown[] = []
       await client.query('BEGIN')
       try {
@@ -130,6 +134,7 @@ export function createD1(client: Client): D1Like {
       return out
     },
     async exec(sql: string) {
+      const client = await source
       await client.query(sql)
     },
   }
