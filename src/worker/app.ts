@@ -119,10 +119,12 @@ export function createApp(authenticate: Authenticate = currentUser) {
   app.get('/api/session', async (c) => {
     const user = await authenticate(c.req.raw, c.env)
     const mode = isLocalPreview(c.req.raw, c.env)
+  ? 'local'
+  : c.env.FREEBUFF_CLIENT_ID && c.env.APP_ORIGIN
+    ? 'freebuff'
+    : c.env.DB
       ? 'local'
-      : c.env.FREEBUFF_CLIENT_ID && c.env.APP_ORIGIN
-        ? 'freebuff'
-        : 'setup'
+      : 'setup'
     let isAdmin = false
     const adminToken = getCookie(c, 'admin_session')
     if (adminToken && c.env.DB) {
