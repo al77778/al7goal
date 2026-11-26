@@ -1,15 +1,20 @@
+
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "web-app",
+  "name": "al7goal",
   "main": "src/worker/index.ts",
   "compatibility_date": "2026-11-11",
+  "upload_source_maps": false,
   "assets": {
     "binding": "ASSETS",
     "run_worker_first": true,
     "not_found_handling": "single-page-application"
   },
-  // Only local data during development. Sites provisions its own database.
   "d1_databases": [
-    { "binding": "DB", "database_name": "web-app", "database_id": "00000000-0000-0000-0000-000000000000" }
+    {
+      "binding": "DB",
+      "database_name": "apryadigoal",
+      "database_id": "014e2811-dc85-445d-8a99-1d87c26aa423"
+    }
   ]
 }
