@@ -57,7 +57,8 @@ function App() {
   if (!session?.database) {
     return <SetupPage />
   }
- // Always start at the sign-in screen until a user session exists.
+  
+  // Always start at the sign-in screen until a user session exists.
   if (!session?.user) {
     return <AuthPage showToast={showToast} />   // login / daftar / OTP / lupa password
   }
