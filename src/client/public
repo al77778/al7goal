@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Motif rangoli">
+  <defs>
+    <g id="petal"><ellipse cx="0" cy="-112" rx="8" ry="26" /></g>
+    <g id="gpetal"><ellipse cx="0" cy="-96" rx="12" ry="24" /></g>
+    <g id="tri"><path d="M0 -181 L9 -163 L-9 -163 Z" /></g>
+    <g id="diamond"><path d="M0 -140 L7 -132 L0 -124 L-7 -132 Z" /></g>
+  </defs>
+  <g transform="translate(200 200)">
+    <circle r="188" fill="#FBF7EF" fill-opacity="0.06" />
+    <circle r="184" fill="none" stroke="#FBF7EF" stroke-width="3" />
+    <circle r="170" fill="#D0382C" />
+    <g fill="#FBF7EF">
+      <use href="#tri" />
+      <use href="#tri" transform="rotate(15)" />
+      <use href="#tri" transform="rotate(30)" />
+      <use href="#tri" transform="rotate(45)" />
+      <use href="#tri" transform="rotate(60)" />
+      <use href="#tri" transform="rotate(75)" />
+      <use href="#tri" transform="rotate(90)" />
+      <use href="#tri" transform="rotate(105)" />
+      <use href="#tri" transform="rotate(120)" />
+      <use href="#tri" transform="rotate(135)" />
+      <use href="#tri" transform="rotate(150)" />
+      <use href="#tri" transform="rotate(165)" />
+      <use href="#tri" transform="rotate(180)" />
+      <use href="#tri" transform="rotate(195)" />
+      <use href="#tri" transform="rotate(210)" />
+      <use href="#tri" transform="rotate(225)" />
+      <use href="#tri" transform="rotate(240)" />
+      <use href="#tri" transform="rotate(255)" />
+      <use href="#tri" transform="rotate(270)" />
+      <use href="#tri" transform="rotate(285)" />
+      <use href="#tri" transform="rotate(300)" />
+      <use href="#tri" transform="rotate(315)" />
+      <use href="#tri" transform="rotate(330)" />
+      <use href="#tri" transform="rotate(345)" />
+    </g>
+    <circle r="158" fill="#0A0908" />
+    <circle r="150" fill="#EFAF3C" />
+    <g fill="#FBF7EF">
+      <use href="#diamond" />
+      <use href="#diamond" transform="rotate(30)" />
+      <use href="#diamond" transform="rotate(60)" />
+      <use href="#diamond" transform="rotate(90)" />
+      <use href="#diamond" transform="rotate(120)" />
+      <use href="#diamond" transform="rotate(150)" />
+      <use href="#diamond" transform="rotate(180)" />
+      <use href="#diamond" transform="rotate(210)" />
+      <use href="#diamond" transform="rotate(240)" />
+      <use href="#diamond" transform="rotate(270)" />
+      <use href="#diamond" transform="rotate(300)" />
+      <use href="#diamond" transform="rotate(330)" />
+    </g>
+    <circle r="146" fill="#0A0908" />
+    <circle r="142" fill="none" stroke="#FBF7EF" stroke-width="1.5" stroke-dasharray="3 7" />
+    <g fill="#FBF7EF">
+      <use href="#petal" />
+      <use href="#petal" transform="rotate(30)" />
+      <use href="#petal" transform="rotate(60)" />
+      <use href="#petal" transform="rotate(90)" />
+      <use href="#petal" transform="rotate(120)" />
+      <use href="#petal" transform="rotate(150)" />
+      <use href="#petal" transform="rotate(180)" />
+      <use href="#petal" transform="rotate(210)" />
+      <use href="#petal" transform="rotate(240)" />
+      <use href="#petal" transform="rotate(270)" />
+      <use href="#petal" transform="rotate(300)" />
+      <use href="#petal" transform="rotate(330)" />
+    </g>
+    <g fill="#2FA95E" stroke="#FBF7EF" stroke-width="1.6">
+      <use href="#gpetal" transform="rotate(15)" />
+      <use href="#gpetal" transform="rotate(45)" />
+      <use href="#gpetal" transform="rotate(75)" />
+      <use href="#gpetal" transform="rotate(105)" />
+      <use href="#gpetal" transform="rotate(135)" />
+      <use href="#gpetal" transform="rotate(165)" />
+      <use href="#gpetal" transform="rotate(195)" />
+      <use href="#gpetal" transform="rotate(225)" />
+      <use href="#gpetal" transform="rotate(255)" />
+      <use href="#gpetal" transform="rotate(285)" />
+      <use href="#gpetal" transform="rotate(315)" />
+      <use href="#gpetal" transform="rotate(345)" />
+    </g>
+    <circle r="86" fill="#EFAF3C" />
+    <circle r="78" fill="#D0382C" />
+    <circle r="64" fill="#0A0908" />
+    <circle r="56" fill="#FBF7EF" />
+    <circle r="44" fill="#EFAF3C" />
+    <circle r="30" fill="#D0382C" />
+    <circle r="17" fill="#FBF7EF" />
+    <circle r="8" fill="#EFAF3C" />
+    <g fill="#FBF7EF">
+      <circle cx="0" cy="-70" r="3" />
+      <circle cx="60.6" cy="-35" r="3" />
+      <circle cx="60.6" cy="35" r="3" />
+      <circle cx="0" cy="70" r="3" />
+      <circle cx="-60.6" cy="35" r="3" />
+      <circle cx="-60.6" cy="-35" r="3" />
+    </g>
+  </g>
+</svg>
