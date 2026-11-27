@@ -57,9 +57,10 @@ function App() {
   if (!session?.database) {
     return <SetupPage />
   }
-  if (!session?.user && session?.mode !== 'local') {
-    return <AuthPage showToast={showToast} />
-  }
+ // Always start at the sign-in screen until a user session exists.
+if (!session?.user) {
+  return <AuthPage showToast={showToast} />   // login / daftar / OTP / lupa password
+}
 
   // Admin login gate if admin requested but not logged in
   if (page === 'admin-login' && !admin) {
