@@ -1,3 +1,7 @@
+// Always start at the sign-in screen until a user session exists.
+if (!session?.user) {
+  return <AuthPage showToast={showToast} />   // login / daftar / OTP / lupa password
+}
 import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import type { Session } from '../shared/types'
