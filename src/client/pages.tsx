@@ -266,39 +266,85 @@ export function KirimPage({ showToast, enabled }: any) {
   function useAccount(a: SavedAccount) {
     setRecipient(a.accountNumber); setRecipientName(a.name); setBank(a.bank)
   }
+  const amt = Number(amount) || 0
+  const fee = amt > 0 && amt < 100000 ? 2500 : 0
   return (
-    <div>
-      <h2 className="section-title">Kirim Uang</h2>
-      <p className="section-sub">Transfer ke rekening tujuan</p>
+    <div className="page">
+      <div className="page-head">
+        <div className="page-head-icon" aria-hidden="true" />
+        <div>
+          <p className="eyebrow">Transfer Dana</p>
+          <h2 className="section-title">Kirim Uang</h2>
+          <p className="section-sub" style={{ margin: 0 }}>Transfer ke rekening tujuan dengan aman</p>
+        </div>
+      </div>
       <div className="grid cols-2">
-        <div className="card glass">
-          <h3 style={{ color: 'var(--text)', fontSize: 15, marginBottom: 12 }}>Rekening Tersimpan</h3>
-          {accounts.length === 0 ? <div className="empty-state">Belum ada rekening tersimpan</div> : (
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <div className="card glass panel">
+          <div className="panel-head">
+            <div>
+              <h3>Rekening Tersimpan</h3>
+              <p className="small muted">Ketuk rekening untuk mengisi formulir</p>
+            </div>
+            <span className="badge demo">{accounts.length} tersimpan</span>
+          </div>
+          {accounts.length === 0 ? (
+            <div className="empty-motif">
+              <div className="empty-icon">🏦</div>
+              <div style={{ fontWeight: 600, color: 'var(--text)' }}>Belum ada rekening tersimpan</div>
+              <div className="small" style={{ marginTop: 4 }}>Simpan rekening favorit agar transfer berikutnya lebih cepat.</div>
+            </div>
+          ) : (
+            <ul className="saved-list">
               {accounts.map((a) => (
-                <li key={a.id} style={{ padding: '10px 0', borderBottom: '1px solid rgba(0,217,255,0.08)', cursor: 'pointer' }} onClick={() => useAccount(a)}>
-                  <div style={{ fontWeight: 600 }}>{a.name}</div>
-                  <div className="small muted">{a.bank} • {a.accountNumber}</div>
+                <li key={a.id}>
+                  <button type="button" className="saved-item" onClick={() => useAccount(a)}>
+                    <span className="avatar-sm">{(a.bank || a.name).slice(0, 2).toUpperCase()}</span>
+                    <span className="saved-meta">
+                      <span className="saved-name">{a.name}</span>
+                      <span className="small muted">{a.bank || 'Bank'} • {a.accountNumber}</span>
+                    </span>
+                    <span className="saved-arrow">→</span>
+                  </button>
                 </li>
               ))}
             </ul>
           )}
           <SaveAccountForm onSaved={(a: SavedAccount) => setAccounts((p) => [a, ...p])} showToast={showToast} enabled={enabled} />
         </div>
-        <div className="card glass">
-          <div className="form-row"><label>Nomor Rekening Tujuan</label><input value={recipient} onChange={(e) => setRecipient(e.target.value)} placeholder="1234567890" /></div>
-          <div className="form-row"><label>Nama Penerima</label><input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} placeholder="Nama penerima" /></div>
-          <div className="form-row"><label>Pilihan Bank</label>
-            <select value={bank} onChange={(e) => setBank(e.target.value)}>
-              <option value="">Pilih bank</option>
-              {['BCA', 'BNI', 'BRI', 'Mandiri', 'CIMB', 'Permata', 'Danamon'].map((b) => <option key={b} value={b}>{b}</option>)}
-            </select>
+        <div className="card glass panel">
+          <div className="panel-head">
+            <div>
+              <h3>Detail Transfer</h3>
+              <p className="small muted">Lengkapi data penerima dan nominal</p>
+            </div>
+            <span className="badge pending">PIN wajib</span>
           </div>
-          <div className="form-row"><label>Nominal Transfer</label><input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" /></div>
-          <div className="form-row"><label>Catatan Transfer</label><textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} /></div>
-          <div className="form-row"><label>PIN Transaksi</label><input type="password" value={pin} onChange={(e) => setPin(e.target.value)} placeholder="••••" /></div>
-          <div className="small muted" style={{ marginBottom: 10 }}>Biaya transaksi: Rp2.500 untuk transfer &lt; Rp100.000, gratis di atasnya.</div>
-          <button className="btn" disabled={busy} onClick={submit}>{busy ? 'Memproses...' : 'Konfirmasi Transfer'}</button>
+          <div className="form-row">
+            <label>Nominal Transfer</label>
+            <div className="amount-field">
+              <span>Rp</span>
+              <input type="number" inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" />
+            </div>
+          </div>
+          <div className="grid cols-2 form-grid" style={{ marginBottom: 15 }}>
+            <div className="form-row"><label>Nomor Rekening Tujuan</label><input value={recipient} onChange={(e) => setRecipient(e.target.value)} placeholder="1234567890" /></div>
+            <div className="form-row"><label>Pilihan Bank</label>
+              <select value={bank} onChange={(e) => setBank(e.target.value)}>
+                <option value="">Pilih bank</option>
+                {['BCA', 'BNI', 'BRI', 'Mandiri', 'CIMB', 'Permata', 'Danamon'].map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="form-row"><label>Nama Penerima</label><input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} placeholder="Nama penerima" /></div>
+          <div className="form-row"><label>Catatan Transfer</label><textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Opsional" /></div>
+          <div className="form-row"><label>PIN Transaksi</label><input type="password" inputMode="numeric" value={pin} onChange={(e) => setPin(e.target.value)} placeholder="••••" /></div>
+          <div className="summary">
+            <div className="summary-row"><span>Nominal</span><span>{fmt(amt)}</span></div>
+            <div className="summary-row"><span>Biaya admin</span><span>{amt === 0 ? '—' : fee ? fmt(fee) : 'Gratis'}</span></div>
+            <div className="summary-row total"><span>Total</span><span>{fmt(amt + fee)}</span></div>
+          </div>
+          <div className="hint">Biaya Rp2.500 untuk transfer di bawah Rp100.000, gratis di atasnya.</div>
+          <button className="btn btn-block" disabled={busy} onClick={submit}>{busy ? 'Memproses...' : 'Konfirmasi Transfer'}</button>
         </div>
       </div>
     </div>
@@ -327,9 +373,9 @@ function SaveAccountForm({ onSaved, showToast, enabled }: any) {
     } catch (e) { showToast(e instanceof Error ? e.message : 'err', 'error') }
     finally { setBusy(false) }
   }
-  if (!open) return <button className="btn ghost" style={{ marginTop: 12 }} onClick={() => setOpen(true)}>+ Tambah Rekening</button>
+  if (!open) return <button className="btn ghost btn-block" style={{ marginTop: 14 }} onClick={() => setOpen(true)}>+ Tambah Rekening</button>
   return (
-    <div style={{ marginTop: 12, padding: 12, border: '1px solid rgba(0,217,255,0.2)', borderRadius: 12 }}>
+    <div style={{ marginTop: 14, padding: 14, border: '1px solid rgba(0,217,255,0.22)', borderRadius: 14, background: 'rgba(4,14,30,0.5)' }}>
       <div className="form-row"><label>Nama</label><input value={name} onChange={(e) => setName(e.target.value)} /></div>
       <div className="form-row"><label>Nomor Rekening</label><input value={num} onChange={(e) => setNum(e.target.value)} /></div>
       <div className="form-row"><label>Bank</label><input value={bank} onChange={(e) => setBank(e.target.value)} /></div>
@@ -776,3 +822,4 @@ export function BantuanPage() {
     </div>
   )
 }
+
