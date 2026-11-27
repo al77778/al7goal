@@ -64,7 +64,9 @@ export async function hashPassword(password: string, salt: string): Promise<stri
   const enc = new TextEncoder()
   const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits'])
   const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt: enc.encode(salt), iterations: 120000, hash: 'SHA-256' },
+    // 100k is the ceiling Cloudflare Workers accepts for PBKDF2; higher values
+    // throw at runtime and every register/login attempt fails with a 500.
+    { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
     key,
     256,
   )
